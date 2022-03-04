@@ -1,0 +1,2 @@
+class VirtualSchedule < ApplicationRecord
+end
