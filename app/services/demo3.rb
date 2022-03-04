@@ -1,48 +1,15 @@
 class Demo3
-  # パフォーマンス比較
+  # generated columns に値をセットしてみる
 
   def call
-    # generated columnなし1
-    benchmark do
-      VirtualSchedule.where("MONTH(starts_at) = ?", rand(1..12))
-                     .where("DAYOFMONTH(starts_at) = ?", rand(1..28))
-                     .count
-    end
+    virtual_schedule = VirtualSchedule.find_by(start_month: 2, start_day: 26)
 
-    # generated columnなし2
-    benchmark do
-      starts_at_expression = format(
-        "%%-%02<month>d-%02<day>d %%",
-        month: rand(1..12),
-        day: rand(1..28)
-      )
-      VirtualSchedule.where("starts_at like ?", starts_at_expression)
-                     .count
-    end
+    pp virtual_schedule
 
-    # Virtual
-    benchmark do
-      VirtualSchedule.where(start_month: rand(1..12))
-                     .where(start_day: rand(1..28))
-                     .count
-    end
+    virtual_schedule.start_month = 3
 
-    # Stored
-    benchmark do
-      StoredSchedule.where(start_month: rand(1..12))
-                    .where(start_day: rand(1..28))
-                    .count
-    end
-  end
+    pp virtual_schedule
 
-  private
-
-  def benchmark
-    result = Benchmark.realtime do
-      10.times do
-        yield
-      end
-    end
-    pp result
+    virtual_schedule.save! # エラー
   end
 end
